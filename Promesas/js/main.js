@@ -272,51 +272,95 @@ let producto = [
 //     }); 
 // }
 
-function getProducto(){  // con fetch
+function getProducto(){
     let promesa = fetch("https://fakestoreapi.com/products", {
         method: "GET"
     });
+    promesa.then( 
+        (response) => {
+            response.json().then((prods) => {
+                    //crear Cards (prods);
+                    console.log("prods=>json()");
+                    console.log(prods);
+                    foreachProductos(prods);
+                }//prods
+            )//then json
+            .catch((err) => {
+                console.error("Error en el formato de la respuesta " + err.message);
+            });//catch json
+        }//response
 
-promesa.then( (response) => {
-    response.json().then((prods) =>{
-        crearcards(prods);
-        console.log("prods=>json()");
-        console.log(prods);
-    }
-
-    )//then json
-    .catch((err)=> {
-        console.error("error en el formato de la respuesta" + err.message)
+    )//Promesa.then
+    .catch((err)=>{
+        console.error("Error en la respuesta " + err.message);
     });
-}//response
-)//then 
-.catch( (error)=> {
-    console.error("error en  la respuesta" + error.message);
-    });//catch promesa
+}
+
+getProducto();
 
 
-}//getProducto
-let mainProds = document.getElementById("mainprods")
-function crearcards(prods) {
-    prods.forEach(prod => {
-        mainProds.insertAdjacentHTML("beforeend",
+function foreachProductos(producto) { 
+   
+    let cuerpoRows = document.getElementById("cartasmain");   
+
+    console.log(producto)
+
+    localStorage.setItem("producto", JSON.stringify(producto)); 
+
+    if (localStorage.getItem("producto")!= null) {
+        
+        producto = JSON.parse(localStorage.getItem("producto"));
+  
+        producto.forEach(r => {            
+            let cartasmain = 
             `
             <div class="col-md-4">
                 <div class="card carta mt-2 mb-2" id="card" style="width: auto;">
-                    <img src="${prod.image}" class="card-img-top" id="card-img-top" alt="...">
+                    <img src="${r.image}" class="card-img-top carta-imagen" id="card-img-top" alt="...">
                     <div class="card-body">
-                        <h5 class="card-title" id="card-title">${prod.title}</h5>
-                        <b class= id="card-category">Categoria - ${prod.category}</b>
-                        <p class="card-text carta-texto" id="card-text">${prod.description}</p>
-                        <h5 class="card-title" id="card-price">$${prod.price}</h5>
+                        <h5 class="card-title carta-titulo" id="card-title">${r.title}</h5>
+                        <b class="carta-categoria" id="card-category">Categoria - ${r.category}</b>
+                        <p class="card-text carta-texto" id="card-text">${r.description}</p>
+                        <h5 class="card-title" id="card-price">$${r.price}</h5>
                         
-                        <a href="#" class="btn btn-success">Ver mas</a>
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop_${r.id}">
+                        Más info
+                        </button>
                     </div>
                 </div>
             </div>
-            `
-        );
-    });
 
-    cuerpoRows.insertAdjacentHTML("beforeend", row);
-}
+            
+            <!-- Button trigger modal -->
+            
+            
+            <!-- Modal -->
+            <div class="modal fade" id="staticBackdrop_${r.id}" data-bs-backdrop="static" data-bs-keyboard="false" 
+            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">${r.title}</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                    ${r.description}
+                    </div>
+                    
+                    <div class="modal-body">
+                    <h5  >$${r.price}</h5> 
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+                        
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            `;
+            cuerpoRows.insertAdjacentHTML("beforeend", cartasmain);
+        });//producto.forEach
+    }//if 
+}//foreachProductos 
+//foreachProductos(producto);
